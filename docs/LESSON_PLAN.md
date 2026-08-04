@@ -1,30 +1,56 @@
-# Build-A-PC — Lesson Plan
+# 📖 Lesson Plan — Build-A-PC
 
-> **Chain K — Hardware & Systems Foundations** | Status: ⬜ scaffold pending | Real-hardware build
+> **Chain K — Hardware & Systems Foundations** | Assemble a desktop PC from parts: compatibility, assembly, BIOS/UEFI, and OS install.
 
 ## What This Project Is
-TODO — Assemble a desktop PC from parts: compatibility, assembly, BIOS/UEFI, and OS install.
+
+Select compatible parts, assemble a working desktop, configure firmware, and install an operating system — turning the computer into an object you understand.
 
 ## Learning Objectives
-- TODO
 
-## Parts & Software You Will Use
-- TODO (with a Buying Guide: what to look for & red flags — Chain K standard)
+By the end I can:
+
+1. Verify CPU/socket, RAM, PSU, and form-factor compatibility before buying.
+2. Assemble safely, managing static and cable routing.
+3. Navigate BIOS/UEFI: boot order, XMP, and firmware settings.
+4. Install an OS from bootable media and partition sensibly.
+5. Explain airflow and why thermals throttle performance.
+6. Diagnose a machine that will not POST.
+
+## Software You Will Use
+
+- PCPartPicker for compatibility checking.
+- A bootable USB (Ventoy or Rufus).
+- An anti-static strap and basic tools.
 
 ## Build Order
-1. TODO
 
-## Safety & Legal Notes
-- TODO (power/battery safety; for cellular: use a carrier SIM on licensed bands with an approved LTE/GSM HAT and follow carrier terms + local RF regulations)
+1. Choose parts and verify every compatibility constraint.
+2. Test-boot outside the case before final assembly.
+3. Assemble and route cables.
+4. Enter UEFI; set boot order and enable XMP.
+5. Install the OS and drivers.
+6. Stress-test and monitor temperatures.
 
 ## Common Mistakes to Avoid
-- TODO
+
+- RAM not fully seated — the most common no-POST cause.
+- Forgetting the CPU power connector.
+- Over-tightening the cooler or applying far too much thermal paste.
+- Buying a PSU on price alone.
+- Ignoring case airflow and then wondering about throttling.
 
 ## Check Your Understanding
-Interactive tour includes a "Check Your Understanding" quiz (Standard #7) — TODO: 5–8 questions.
+
+The quiz covers compatibility checks, POST troubleshooting order, XMP, and thermal behaviour.
 
 ## Why This Matters (Industry Application)
-TODO (Standard #8) — what roles/skills this builds, why I added it, what I expect to gain, how it connects forward.
+
+Hardware literacy pays off in unexpected places: sizing cloud instances sensibly, diagnosing whether a
+problem is code or capacity, and talking credibly with infrastructure teams. It also removes a category of
+intimidation — machines stop being magic.
 
 ## Reflection Questions
-- TODO
+
+- Which part would you spend more on next time, and what evidence changed your mind?
+- How does building this change how you read cloud instance specifications?
