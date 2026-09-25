@@ -1,9 +1,726 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1"><title>Build-A-PC — Tour</title>
-<style>body{margin:0;font-family:-apple-system,sans-serif;background:#0d0d12;color:#e6e6e6}
-header{padding:18px 24px;border-bottom:1px solid #ffffff14}main{display:grid;grid-template-columns:1fr 1fr;min-height:60vh}
-.lesson,.practice{padding:24px}.lesson{border-right:1px solid #ffffff14}h1,h2{color:#64748B}
-textarea{width:100%;min-height:240px;background:#0000005c;color:#e6e6e6;border:1px solid #ffffff1a;border-radius:8px;padding:12px;font-family:ui-monospace,monospace}</style></head>
-<body><header><h1>Build-A-PC — Interactive Tour (TODO)</h1><p>4-lesson split-panel tour scaffold + Check Your Understanding quiz. See docs/LESSON_PLAN.md.</p></header>
-<main><section class="lesson"><h2>Lesson 1 — TODO</h2><p>Concept + wiring diagram on the left.</p></section>
-<section class="practice"><h3>Practice (TODO)</h3><textarea>// TODO starter code / config</textarea></section></main></body></html>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Build A PC &mdash; Interactive Tour</title>
+<style>
+  :root { --bg:#0e1116; --accent:#94a3b8; --accent-deep:#64748B; --panel:#0000002e;
+          --text:#e6e6e6; --muted:#9aa0a6; --good:#4ade80; --bad:#f87171; --warn:#fbbf24; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);line-height:1.55}
+  header{padding:18px 24px;border-bottom:1px solid #ffffff14}
+  header h1{margin:0;font-size:20px;color:var(--accent)}
+  header p{margin:6px 0 0;color:var(--muted);font-size:13px}
+  header .persist-note{margin-top:4px;font-size:11px;color:var(--muted);opacity:.8}
+  .badge{display:inline-block;background:var(--accent-deep);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;margin-left:8px}
+  .pills{display:flex;gap:6px;flex-wrap:wrap;padding:12px 24px;border-bottom:1px solid #ffffff14}
+  .pill{font-size:12px;padding:4px 10px;border:1px solid #ffffff22;border-radius:999px;color:var(--muted);cursor:pointer;background:transparent}
+  .pill.active{background:var(--accent);color:#0e1116;font-weight:600;border-color:var(--accent)}
+  .pill.done{border-color:var(--good);color:var(--good)}
+  .pill.tool{border-style:dashed}
+  main{display:grid;grid-template-columns:1fr 1fr;min-height:60vh}
+  @media (max-width:880px){main{grid-template-columns:1fr}.lesson{border-right:none!important;border-bottom:1px solid #ffffff14}}
+  .lesson,.practice{padding:22px 24px}
+  .lesson{border-right:1px solid #ffffff14}
+  .lesson h2{color:var(--accent);margin-top:0;font-size:18px}
+  .lesson ul{padding-left:18px}.lesson li{margin:6px 0}
+  .trap{border-left:3px solid var(--warn);background:#fbbf2410;padding:10px 12px;border-radius:4px;margin:12px 0;font-size:14px}
+  .trap b{color:var(--warn)}
+  .worked{border-left:3px solid var(--accent-deep);background:#ffffff08;padding:10px 12px;border-radius:4px;margin:12px 0;font-size:14px}
+  figure{margin:14px 0}figcaption{color:var(--muted);font-size:12px;margin-top:6px}
+  .practice h3{margin-top:0;color:var(--accent);font-size:16px}
+  .nav{display:flex;gap:10px;align-items:center;padding:14px 24px;border-top:1px solid #ffffff14}
+  button{font:inherit}
+  button.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent);border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer}
+  button.ghost:disabled{opacity:.35;cursor:not-allowed}
+  .counter{color:var(--muted);font-size:13px;margin-left:auto}
+  .qc{margin-top:16px;border-top:1px solid #ffffff14;padding-top:14px}
+  .qc h4{margin:0 0 8px;font-size:14px;color:var(--accent)}
+  .opt{all:unset;display:flex;align-items:center;gap:8px;padding:8px 10px;margin:4px 0;border:1px solid #ffffff1a;border-radius:8px;cursor:pointer;font-size:14px}
+  .opt:hover{border-color:var(--accent)}
+  .opt.correct{border-color:var(--good);background:#4ade8018}
+  .opt.wrong{border-color:var(--bad);background:#f8717118}
+  .opt[disabled]{cursor:default}
+  .explain{display:none;margin-top:8px;font-size:13px;color:var(--muted);border-left:2px solid var(--accent-deep);padding-left:10px}
+  .links{margin-top:14px;font-size:13px}
+  .links a{color:var(--accent);display:inline-block;margin:3px 0}
+  .links .kind{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em;margin-right:6px}
+  .video-card{display:flex;gap:10px;align-items:center;border:1px solid #ffffff1a;border-radius:8px;padding:8px;text-decoration:none;color:var(--text);margin-top:6px}
+  .video-card:hover{border-color:var(--accent)}
+  .video-card-thumb{width:96px;height:54px;border-radius:4px;background-size:cover;background-position:center;position:relative;flex-shrink:0}
+  .video-card-play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;text-shadow:0 0 6px #000}
+  .video-card-info b{display:block;font-size:13px}
+  .video-card-info span{color:var(--muted);font-size:12px}
+  table.cheat{border-collapse:collapse;width:100%;font-size:13px;margin-top:8px}
+  table.cheat td,table.cheat th{border:1px solid #ffffff14;padding:6px 8px;text-align:left}
+  table.cheat th{color:var(--accent)}
+  code{background:#ffffff12;padding:1px 5px;border-radius:3px;font-family:ui-monospace,monospace;font-size:13px}
+  .quiz-wrap{padding:22px 24px;border-top:1px solid #ffffff14}
+  .q{margin-bottom:18px}.q p{font-weight:600;margin:0 0 6px}
+  #score{font-weight:700;color:var(--accent)}
+  .flash-stage{display:flex;justify-content:center;padding:18px 0;perspective:1200px}
+  .flash-card{width:min(420px,90%);height:190px;position:relative;cursor:pointer;transform-style:preserve-3d;transition:transform .45s}
+  .flash-card.flipped{transform:rotateY(180deg)}
+  .flash-face{position:absolute;inset:0;backface-visibility:hidden;border:1px solid #ffffff22;border-radius:12px;
+              display:flex;align-items:center;justify-content:center;text-align:center;padding:18px;font-size:16px}
+  .flash-front{background:#ffffff08;color:var(--text);font-weight:700}
+  .flash-back{background:var(--accent-deep);color:#fff;transform:rotateY(180deg);font-size:14px;font-weight:400}
+  .flash-controls{display:flex;gap:10px;align-items:center;justify-content:center;margin-top:8px}
+  .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+  .match-col{display:flex;flex-direction:column;gap:8px}
+  .match-btn{all:unset;padding:10px 12px;border:1px solid #ffffff1a;border-radius:8px;cursor:pointer;font-size:13px;text-align:left}
+  .match-btn:hover{border-color:var(--accent)}
+  .match-btn.sel{border-color:var(--accent);background:#94a3b818}
+  .match-btn.matched{border-color:var(--good);background:#4ade8018;opacity:.55;cursor:default}
+  .match-btn.wrong{border-color:var(--bad);background:#f8717118}
+  .post-check{all:unset;display:block;width:100%;padding:10px 12px;margin:6px 0;border:1px solid #ffffff1a;border-radius:8px;cursor:pointer;font-size:13px;box-sizing:border-box}
+  .post-check:hover{border-color:var(--accent)}
+  .post-check[disabled]{cursor:default;opacity:.55}
+  .post-check.root{border-color:var(--good);background:#4ade8018}
+  .post-check.ruled-out{border-color:#ffffff1a}
+  .post-outcome{font-size:12px;color:var(--muted);margin-top:4px;padding-left:2px}
+  .post-outcome.root{color:var(--good)}
+  .post-solved{margin-top:14px;padding:12px 14px;border-radius:8px;border:1px solid var(--good);background:#4ade8018;color:var(--good);font-size:14px}
+  .report-card{border:1px solid #ffffff22;border-radius:10px;padding:20px 22px;max-width:560px}
+  .report-card h4{margin:16px 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+  .report-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #ffffff10;font-size:14px}
+  .report-row .grade{font-weight:700}
+  .grade-A{color:var(--good)} .grade-B{color:#a3e635} .grade-C{color:var(--warn)} .grade-D,.grade-F{color:var(--bad)} .grade-dash{color:var(--muted)}
+  .report-overall{display:flex;align-items:baseline;gap:10px;margin:14px 0}
+  .report-overall .big{font-size:40px;font-weight:800}
+  #printBtn{margin-top:16px}
+  @media print{
+    header .persist-note, .pills, #nav, .report-card #printBtn{display:none!important}
+    body{background:#fff;color:#111}
+    .report-card{border-color:#ccc;max-width:none}
+    .report-row{border-bottom-color:#ddd}
+  }
+</style></head>
+<body>
+<header>
+  <h1>Build A PC <span class="badge">Chain K &middot; Hands-on</span></h1>
+  <p>Compatibility &rarr; assembly &rarr; BIOS/UEFI &rarr; OS install, thermals &amp; troubleshooting.
+     Practice systematic no-POST diagnosis in the POST Troubleshooting Simulator before a real machine
+     won't boot on you.</p>
+  <p class="persist-note">Progress (quick checks, quiz score, flashcards known) saves in this browser
+     only &mdash; localStorage, not an account. Clearing site data or switching browsers resets it.</p>
+</header>
+
+<div class="pills" id="pills"></div>
+
+<main>
+  <section class="lesson" id="lesson"></section>
+  <section class="practice" id="practice"></section>
+</main>
+
+<div class="nav" id="nav">
+  <button class="ghost" id="prev">&larr; Previous</button>
+  <button class="ghost" id="next">Next &rarr;</button>
+  <span class="counter" id="counter"></span>
+</div>
+
+<div class="quiz-wrap" id="quizWrap" style="display:none">
+  <h3 style="color:var(--accent);margin-top:0">Check Your Understanding</h3>
+  <div id="quiz"></div>
+  <p>Score: <span id="score">0</span> / <span id="total"></span></p>
+</div>
+
+<div class="quiz-wrap" id="toolWrap" style="display:none"></div>
+
+<script>
+const LESSONS = [
+{
+  short:"Compatibility",
+  title:"Compatibility: the part of this project that actually matters most",
+  body:`<p>Nearly every build problem traces back to a compatibility decision made — or skipped —
+  before any part was purchased. This lesson is the one that prevents the other three from mattering.</p>
+  <ul><li>The <b>CPU socket</b> must match the motherboard exactly — LGA1700, AM5, whatever it is — not
+  just "same brand as my old build." Socket names are sometimes reused across CPU generations, which
+  creates its own trap below.</li>
+  <li><b>RAM generation</b> (DDR4 vs DDR5) is dictated by the <i>motherboard</i>, not the CPU alone — a
+  DDR5-only board won't physically accept DDR4 sticks (different notch position).</li>
+  <li>The <b>QVL (Qualified Vendor List)</b> is the motherboard manufacturer's list of RAM kits they've
+  actually tested. A kit not on it isn't guaranteed to fail, but the risk of instability — especially at
+  advertised XMP speeds — is real and worth checking before buying.</li>
+  <li><b>PSU wattage</b> should be sized with headroom above the bare minimum: modern PSU calculators
+  account for transient power spikes, since a GPU can briefly draw well above its rated TDP under load.</li></ul>
+  <div class="trap"><b>The trap:</b> assuming "same socket name" always means compatible. Some sockets
+  are reused across CPU generations with a required BIOS update in between — an old motherboard's
+  firmware may not even recognize a newer CPU until flashed, sometimes needing an older compatible CPU
+  or a "BIOS flashback" feature just to get the update installed before the new CPU can POST at all.</div>
+  <div class="worked"><b>Worked:</b> before buying a RAM kit, search the motherboard's official QVL page
+  for that exact kit (or one with the same chip and timings). Finding it there is real evidence, not
+  just marketing compatibility claims on the RAM's own packaging.</div>`,
+  practice:`<h3>Practice — verify before you buy</h3>
+  <ol><li>Pick a hypothetical CPU + motherboard + RAM combination and verify all three compatibility
+  points (socket, RAM generation, QVL listing) using the manufacturer's own documentation, not a
+  retailer's product description.</li></ol>`,
+  quick:{ q:"A motherboard's socket name matches your CPU, but the board is two BIOS revisions behind the CPU's release. What's the real risk?",
+    choices:["The board's current firmware may not recognize the newer CPU until updated — it may not POST at all until flashed","No risk — matching socket names always guarantees full compatibility","The RAM speed will be affected but the CPU will work fine","This only matters for laptops, not desktop builds"],
+    a:0, ex:"Socket compatibility alone doesn't guarantee firmware support for a newer CPU generation. An out-of-date BIOS can fail to recognize the CPU entirely, sometimes requiring an older compatible CPU or a BIOS-flashback feature just to apply the update first." },
+  links:[
+    {type:"read", label:"Raspberry Pi Documentation — Configuration (general hardware-compatibility reference habit, applied here to PC parts)", url:"https://www.raspberrypi.com/documentation/computers/configuration.html"}
+  ]
+},
+{
+  short:"Assembly",
+  title:"Assembly: static safety and the order that saves you time",
+  body:`<p>Assembly mistakes are almost all preventable with two habits: grounding yourself, and testing
+  before you commit to the case.</p>
+  <ul><li><b>ESD (electrostatic discharge)</b> damage is often <i>not</i> immediately obvious — it can
+  cause premature failure or subtle instability weeks later instead of an instant dead part. An
+  anti-static wrist strap grounds you to the case chassis and removes the risk entirely for the cost of
+  a $7 strap.</li>
+  <li>CPU sockets are <b>zero-force-insertion</b> — align the corner indicator precisely and the CPU
+  should drop in with no pressure. If you feel resistance, stop and recheck alignment; forcing it bends
+  pins.</li>
+  <li><b>Test-boot outside the case first</b> — CPU, RAM, and GPU on the motherboard box or an
+  anti-static surface, PSU connected, before final assembly. This isolates whether a problem is in the
+  core components themselves or something introduced during case assembly (a pinched cable, a shorted
+  standoff).</li>
+  <li><b>Cable routing</b> isn't cosmetic — cables blocking airflow paths directly hurt thermals, and a
+  cable under tension at a connector can work loose over time, the same strain-relief principle from
+  Cyberdeck-Build.</li></ul>
+  <div class="trap"><b>The trap — the single most common first-build mistake:</b> forgetting the
+  separate CPU power connector (the 4/8-pin EPS connector near the CPU, distinct from the main 24-pin
+  board connector). The system can often power on — fans spin, lights come on — without it, but fails to
+  POST, which looks exactly like a mysterious dead board rather than one missing cable.</div>
+  <div class="worked"><b>Worked:</b> test-booting outside the case with everything connected except one
+  cable, then systematically confirming each connector, catches the EPS-cable mistake in under a minute
+  — versus discovering it after the case is fully closed up and cable-managed.</div>`,
+  practice:`<h3>Practice — POST Troubleshooting Simulator</h3>
+  <ol><li>Open the <b>POST Troubleshooting Simulator</b> tab and work through Scenario 1 — "fans spin,
+  no display, no beep." Check items in whatever order seems reasonable and see how many checks it takes
+  to find the actual cause.</li></ol>`,
+  quick:{ q:"A system's fans spin and lights come on, but there's no display and no beep. What's a genuinely common cause that produces exactly this symptom?",
+    choices:["The separate CPU power connector (EPS) was never plugged in","The case is unplugged from the wall","The monitor is broken","The RAM generation doesn't match the motherboard"],
+    a:0, ex:"Fans and lights only need the 24-pin connector and standby power — they don't prove the CPU is actually receiving power. A missing EPS connector produces exactly this 'looks alive but won't POST' symptom." },
+  links:[
+    {type:"read", label:"Raspberry Pi Documentation — Configuration", url:"https://www.raspberrypi.com/documentation/computers/configuration.html"}
+  ]
+},
+{
+  short:"BIOS/UEFI",
+  title:"BIOS/UEFI: the settings that matter before an OS exists",
+  body:`<p>UEFI is the modern firmware interface (replacing legacy BIOS) that configures hardware before
+  any operating system is even involved — and it hides one setting that quietly undersells your own RAM
+  if you skip it.</p>
+  <ul><li><b>Boot order</b> must be set to boot from your installation media (USB) first when installing
+  an OS, then switched back to the internal drive afterward.</li>
+  <li><b>XMP (Extreme Memory Profile)</b> is a stored profile that runs your RAM at its actual rated
+  speed and timings. Without enabling it, RAM runs at a conservative JEDEC default — often well below
+  the speed printed on the box — which is the actual answer to "why is my RAM slower than advertised."</li></ul>
+  <div class="trap"><b>The trap — a listed Common Mistake:</b> over-tightening the cooler mount, or
+  applying far too much thermal paste. A pea-sized amount is typically sufficient for most coolers —
+  excess paste doesn't improve heat transfer and can spill onto socket pins; an over-tightened mount can
+  bend or crack the motherboard PCB, a mistake that's expensive and sometimes not immediately obvious.</div>
+  <div class="worked"><b>Worked:</b> a system boots fine but benchmarks show RAM running at 2133MT/s
+  when the kit is rated for 6000MT/s. The fix isn't a hardware problem — it's enabling XMP in UEFI, which
+  was never on by default.</div>`,
+  practice:`<h3>Practice — before you install anything</h3>
+  <ol><li>If you have real hardware: enter UEFI, confirm boot order, and enable XMP. Note the RAM speed
+  reported before and after.</li></ol>`,
+  quick:{ q:"RAM rated for 6000MT/s is showing as running at 2133MT/s. What's the likely explanation?",
+    choices:["XMP was never enabled in UEFI, so RAM defaulted to a conservative JEDEC speed","The RAM kit is defective","The motherboard doesn't support that RAM at all","The CPU is throttling due to heat"],
+    a:0, ex:"Without enabling XMP, RAM runs at its safe default speed rather than its advertised rated speed. This is a firmware setting, not a hardware fault — a very common 'why is my RAM slow' situation." },
+  links:[
+    {type:"read", label:"Raspberry Pi Documentation — Configuration", url:"https://www.raspberrypi.com/documentation/computers/configuration.html"}
+  ]
+},
+{
+  short:"OS, thermals & troubleshooting",
+  title:"OS install, thermals, and diagnosing a dead build",
+  body:`<p>The last mile — getting an OS on the machine — and the systematic process for when something
+  earlier in the build doesn't work.</p>
+  <ul><li><b>Bootable media</b>: tools like Rufus or Ventoy write an OS installer to a USB drive. Ventoy
+  in particular lets you drop multiple ISO files onto one USB without reformatting each time.</li>
+  <li><b>GPT partitioning</b> is the modern partition table required for UEFI boot — the OS installer
+  handles this automatically in most cases, but it's worth knowing why "GPT vs MBR" comes up.</li>
+  <li><b>Airflow</b> needs a coherent path — front intake, rear/top exhaust — not just fans pointed in
+  random directions. Insufficient airflow causes <b>thermal throttling</b>: the CPU/GPU automatically
+  downclocks under heat, the exact same principle as a Pi throttling in a sealed enclosure.</li>
+  <li><b>POST troubleshooting order</b>, the systematic version of Learning Objective 6: check power
+  connections (24-pin <i>and</i> CPU power) → reseat RAM, one stick at a time in the board's recommended
+  slot → recheck the CPU power cable specifically → check for a shorted standoff under the board → check
+  the motherboard's debug LEDs or speaker beep codes if it has them.</li></ul>
+  <div class="trap"><b>The trap — a listed Common Mistake:</b> buying a PSU on price alone. Wattage is
+  only part of the story — real transient response and protection circuitry (over-current, over-voltage,
+  short-circuit protection) is what actually distinguishes a reliable unit from a cheap one, and it's the
+  one component whose catastrophic failure can take other parts down with it.</div>
+  <div class="worked"><b>Worked — the systematic order in action:</b> no display, no beep. Power
+  connections confirmed present (both 24-pin and EPS). RAM reseated, one stick at a time — no change.
+  CPU power cable rechecked — already seated. Standoffs checked — one found shorting against the case
+  tray. Removed the extra standoff, system POSTs. Five ordered checks, no guessing, no parts swapped
+  unnecessarily.</div>`,
+  practice:`<h3>Practice — POST Troubleshooting Simulator</h3>
+  <ol><li>Work through Scenarios 2 and 3 in the simulator — a power-cycling system and a no-display
+  system that does beep once. Notice how the diagnostic order changes based on which symptoms you
+  actually have.</li></ol>`,
+  quick:{ q:"You're troubleshooting a no-POST system. What should you check before assuming a part is defective and swapping it?",
+    choices:["Work the systematic order first: power connections, RAM reseat, CPU power cable, standoffs — in that order","Immediately replace the most expensive component first","Reinstall the OS","Reset the BIOS to factory defaults without checking anything physical first"],
+    a:0, ex:"Swapping parts without a systematic check first wastes time and money on guesses. The ordered checklist — power, RAM, CPU power cable, standoffs — catches the vast majority of no-POST causes without replacing anything." },
+  links:[
+    {type:"read", label:"Raspberry Pi Documentation — Configuration", url:"https://www.raspberrypi.com/documentation/computers/configuration.html"}
+  ]
+}
+];
+
+const QUIZ = [
+ {q:"A motherboard supports DDR5 only. What happens if you try to install a DDR4 kit?",
+  o:["It physically won't fit — DDR4 and DDR5 have different notch positions","It fits and works, just at reduced speed","It fits but voids the warranty only","It works fine as long as XMP is disabled"],c:0,
+  ex:"RAM generation compatibility is enforced physically, not just electrically — the notch position differs between DDR4 and DDR5, so a mismatched stick simply won't seat."},
+ {q:"What does a motherboard's QVL actually tell you?",
+  o:["Which specific RAM kits the manufacturer has tested and confirmed working on that board","The maximum CPU wattage the board supports","Which operating systems are certified for the board","The board's warranty terms"],c:0,
+  ex:"The Qualified Vendor List is the manufacturer's own tested-compatible parts list — most commonly referenced for RAM kits, especially at advertised XMP speeds."},
+ {q:"Why is ESD (electrostatic discharge) damage particularly dangerous during a build?",
+  o:["It's often not immediately obvious — it can cause premature failure or subtle instability later instead of an instant dead part","It always destroys the component instantly and obviously","It only affects the PSU, not other components","Modern components are fully immune to it"],c:0,
+  ex:"ESD damage frequently doesn't show up as an immediate failure, making it easy to blame a later, unrelated problem on something else instead of the actual cause — a static strap costs almost nothing and removes the risk entirely."},
+ {q:"What's the actual purpose of test-booting a build outside the case before final assembly?",
+  o:["It isolates whether a problem is in the core components or something introduced during case assembly","It's purely a cosmetic/convenience step with no diagnostic value","It's required by most motherboard warranties","It only matters for overclocked builds"],c:0,
+  ex:"If a system works fine outside the case but not inside it, the problem is almost certainly something about case assembly — a pinched cable or a shorted standoff — not a defective core component."},
+ {q:"What does enabling XMP in UEFI actually change?",
+  o:["It runs RAM at its rated speed/timings instead of a conservative default","It overclocks the CPU automatically","It's required for the system to boot at all","It only affects gaming performance, nothing else"],c:0,
+  ex:"Without XMP, RAM defaults to a safe JEDEC speed well below its advertised rated speed. XMP applies the manufacturer's tested profile to actually reach the speed printed on the box."},
+ {q:"Why does insufficient case airflow cause reduced performance rather than an immediate failure?",
+  o:["The CPU/GPU automatically downclock (thermal throttle) to avoid overheating, rather than failing outright","Insufficient airflow has no measurable performance effect","It only affects boot time, not sustained performance","It causes immediate permanent hardware damage every time"],c:0,
+  ex:"Thermal throttling is a protective, automatic response — components reduce their clock speed under heat rather than failing, which is exactly why 'it's just slower than it should be' is often a thermal problem, not a defect."},
+ {q:"What's the recommended order for diagnosing a no-POST system?",
+  o:["Power connections, then RAM reseat, then CPU power cable specifically, then check for shorted standoffs","Replace the CPU first, since it's the most likely cause statistically","Reinstall the OS before checking any hardware","Check standoffs first, then ignore RAM entirely"],c:0,
+  ex:"Working through power connections, RAM, the CPU power cable, and standoffs in order catches the vast majority of real no-POST causes without guessing or swapping parts unnecessarily."}
+];
+
+/* Key terms — pulled from the bolded terms across the four lessons above. */
+const KEY_TERMS = [
+  ["CPU socket", "Must match the motherboard exactly (e.g. LGA1700, AM5) — socket names are sometimes reused across CPU generations, requiring a BIOS update."],
+  ["RAM generation (DDR4/DDR5)", "Dictated by the motherboard, not the CPU alone — DDR4 and DDR5 sticks have different notch positions and aren't interchangeable."],
+  ["QVL (Qualified Vendor List)", "The motherboard manufacturer's list of RAM kits actually tested and confirmed working on that board."],
+  ["PSU wattage headroom", "Sized above the bare minimum to cover transient power spikes, since a GPU can briefly draw well above its rated TDP."],
+  ["BIOS flashback / firmware gap", "A socket reused across CPU generations may need a firmware update before a newer CPU is even recognized enough to POST."],
+  ["ESD (electrostatic discharge)", "Silent component damage from static — often not immediately obvious, causing premature failure or instability later instead."],
+  ["Zero-force-insertion socket", "A CPU socket that should never require force to seat — resistance means stop and recheck alignment."],
+  ["Test-boot outside the case", "Isolates whether a problem is in the core components or something introduced during case assembly."],
+  ["CPU power connector (EPS)", "The separate 4/8-pin connector near the CPU, distinct from the main 24-pin — the single most commonly forgotten cable."],
+  ["Cable routing for airflow", "Not cosmetic — cables blocking airflow paths directly hurt thermals, and taut cables can work loose over time."],
+  ["UEFI", "The modern firmware interface (replacing legacy BIOS) that configures hardware before any OS is involved."],
+  ["XMP (Extreme Memory Profile)", "A stored profile that runs RAM at its rated speed/timings instead of a conservative default — not on unless enabled."],
+  ["Thermal paste application", "A pea-sized amount is typically sufficient — excess doesn't improve heat transfer and can cause other problems."],
+  ["Bootable media (Rufus/Ventoy)", "Tools for creating a USB OS installer — Ventoy allows multiple ISOs on one USB without reformatting."],
+  ["GPT partitioning", "The modern partition table required for UEFI boot."],
+  ["Thermal throttling", "Automatic downclocking under heat to avoid damage — presents as reduced performance, not failure."],
+  ["POST troubleshooting order", "Power connections → RAM reseat → CPU power cable → standoffs → debug LEDs/beep codes, worked in order."],
+  ["PSU protection circuitry", "Over-current/over-voltage/short-circuit protection — what actually distinguishes a reliable PSU from a cheap one, beyond wattage."]
+];
+
+const STATE_KEY = 'chainK_buildAPC_v1';
+function loadState(){
+  try{ const raw = localStorage.getItem(STATE_KEY); return raw ? JSON.parse(raw) : null; }
+  catch(e){ return null; }
+}
+function saveState(){
+  try{
+    localStorage.setItem(STATE_KEY, JSON.stringify({
+      answered, quizScore: score, quizDone: [...done], fcKnown: [...fcKnown],
+      popLastScore, popLastTotal, popAttemptsCount, matchBestAttempts, postBestChecks
+    }));
+  }catch(e){ /* storage unavailable — progress just won't persist this session */ }
+}
+const SAVED = loadState();
+
+let idx = 0;
+const answered = SAVED && Array.isArray(SAVED.answered) && SAVED.answered.length === LESSONS.length
+  ? SAVED.answered.slice() : new Array(LESSONS.length).fill(false);
+
+function videoCard(l){
+  return `<a class="video-card" href="${l.url}" target="_blank" rel="noopener">
+    <span class="video-card-thumb" style="background-image:url('https://img.youtube.com/vi/${l.vid}/hqdefault.jpg')">
+      <span class="video-card-play">&#9658;</span></span>
+    <span class="video-card-info"><b>${l.label}</b><span>${l.channel} &middot; opens on YouTube</span></span></a>`;
+}
+function renderLinks(links){
+  if(!links || !links.length) return '';
+  const rows = links.map(l => l.type === 'watch'
+    ? videoCard(l)
+    : `<div><span class="kind">${l.type}</span><a href="${l.url}" target="_blank" rel="noopener">${l.label}</a></div>`).join('');
+  return `<div class="links"><h4 style="margin:0 0 6px;font-size:14px;color:var(--accent)">Continue learning</h4>${rows}</div>`;
+}
+function renderQuick(i){
+  const q = LESSONS[i].quick;
+  if(!q) return '';
+  const isDone = answered[i];
+  return `<div class="qc"><h4>Quick check</h4><p style="margin:0 0 6px;font-size:14px">${q.q}</p>
+    <div id="qcopts">${q.choices.map((c,ci)=>`<button class="opt ${isDone && ci===q.a?'correct':''}" data-ci="${ci}" ${isDone?'disabled':''}>${c}</button>`).join('')}</div>
+    <div class="explain" id="qcex" style="${isDone?'display:block':''}">${isDone?q.ex:''}</div></div>`;
+}
+
+const TOOLS = ['Flashcards','Match','Pop Quiz','Cheat Sheet','POST Troubleshooting Simulator','Report Card'];
+function pillsHTML(){
+  const lessonPills = LESSONS.map((l,i)=>
+    `<button class="pill ${i===idx?'active':''} ${answered[i]?'done':''}" data-i="${i}">${i+1}. ${l.short}</button>`).join('');
+  const quizPill = `<button class="pill ${idx===LESSONS.length?'active':''}" data-i="${LESSONS.length}">Quiz</button>`;
+  const toolPills = TOOLS.map((t,ti)=>{
+    const i = LESSONS.length + 1 + ti;
+    return `<button class="pill tool ${i===idx?'active':''}" data-i="${i}">${t}</button>`;
+  }).join('');
+  return lessonPills + quizPill + toolPills;
+}
+function render(){
+  document.getElementById('pills').innerHTML = pillsHTML();
+  const isQuiz = idx === LESSONS.length;
+  const isTool = idx > LESSONS.length;
+  document.querySelector('main').style.display = (isQuiz || isTool) ? 'none' : 'grid';
+  document.getElementById('quizWrap').style.display = isQuiz ? 'block' : 'none';
+  document.getElementById('toolWrap').style.display = isTool ? 'block' : 'none';
+  document.getElementById('nav').style.display = isTool ? 'none' : 'flex';
+  if(isTool){ renderTool(idx - LESSONS.length - 1); return; }
+  if(isQuiz){ document.getElementById('counter').textContent = 'Final quiz'; renderQuiz(); syncNav(); return; }
+  const L = LESSONS[idx];
+  document.getElementById('lesson').innerHTML =
+    `<h2>${idx+1}. ${L.title}</h2>${L.body}${renderLinks(L.links)}${renderQuick(idx)}`;
+  document.getElementById('practice').innerHTML = L.practice;
+  document.getElementById('counter').textContent = `Lesson ${idx+1} of ${LESSONS.length}`;
+  const opts = document.getElementById('qcopts');
+  if(opts) opts.addEventListener('click', e => {
+    const b = e.target.closest('.opt'); if(!b || b.disabled) return;
+    const q = LESSONS[idx].quick, pick = +b.dataset.ci;
+    [...opts.children].forEach((el,ci)=>{ el.disabled = true;
+      if(ci===q.a) el.classList.add('correct'); else if(ci===pick) el.classList.add('wrong'); });
+    const ex = document.getElementById('qcex'); ex.textContent = q.ex; ex.style.display='block';
+    answered[idx] = true;
+    saveState();
+    syncNav(); render2Pills();
+  });
+  syncNav();
+}
+function render2Pills(){
+  document.querySelectorAll('.pill').forEach((p,i)=>{ if(answered[i]) p.classList.add('done'); });
+}
+function syncNav(){
+  document.getElementById('prev').disabled = idx === 0;
+  const n = document.getElementById('next');
+  const gated = idx < LESSONS.length && !answered[idx];
+  n.disabled = idx > LESSONS.length - 1 || gated;
+  n.textContent = gated ? 'Answer the quick check to continue' : 'Next →';
+}
+
+let score = SAVED && Number.isFinite(SAVED.quizScore) ? SAVED.quizScore : 0;
+let done = new Set(SAVED && Array.isArray(SAVED.quizDone) ? SAVED.quizDone : []);
+function renderQuiz(){
+  document.getElementById('total').textContent = QUIZ.length;
+  document.getElementById('quiz').innerHTML = QUIZ.map((it,qi)=>{
+    const isDone = done.has(qi);
+    return `<div class="q"><p>${qi+1}. ${it.q}</p>
+      <div data-q="${qi}">${it.o.map((o,oi)=>`<button class="opt ${isDone && oi===it.c?'correct':''}" data-q="${qi}" data-o="${oi}" ${isDone?'disabled':''}>${o}</button>`).join('')}</div>
+      <div class="explain" id="qex${qi}" style="${isDone?'display:block':''}">${isDone?it.ex:''}</div></div>`;
+  }).join('');
+  document.getElementById('score').textContent = score;
+}
+document.getElementById('quiz').addEventListener('click', e => {
+  const b = e.target.closest('.opt'); if(!b || b.disabled) return;
+  const qi = +b.dataset.q, oi = +b.dataset.o, it = QUIZ[qi];
+  if(done.has(qi)) return; done.add(qi);
+  b.parentElement.querySelectorAll('.opt').forEach((el,i)=>{ el.disabled = true;
+    if(i===it.c) el.classList.add('correct'); else if(i===oi) el.classList.add('wrong'); });
+  const ex = document.getElementById('qex'+qi); ex.textContent = it.ex; ex.style.display='block';
+  if(oi===it.c){ score++; document.getElementById('score').textContent = score; }
+  saveState();
+});
+
+function shuffled(arr){
+  const a = [...arr];
+  for(let i=a.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; }
+  return a;
+}
+function renderTool(view){
+  if(view===0) return renderFlash();
+  if(view===1) return renderMatch();
+  if(view===2) return renderPop();
+  if(view===3) return renderCheat();
+  if(view===4) return renderPostSim();
+  if(view===5) return renderReportCard();
+}
+
+let fcIdx = 0;
+const fcKnown = new Set(SAVED && Array.isArray(SAVED.fcKnown) ? SAVED.fcKnown : []);
+function renderFlash(){
+  const t = KEY_TERMS[fcIdx];
+  document.getElementById('toolWrap').innerHTML = `
+    <h3 style="color:var(--accent);margin-top:0">Flashcards</h3>
+    <p style="color:var(--muted);font-size:13px">Click a card to flip it. ${fcKnown.size} / ${KEY_TERMS.length} marked known.</p>
+    <div class="flash-stage"><div class="flash-card" id="flashCard">
+      <div class="flash-face flash-front">${t[0]}</div>
+      <div class="flash-face flash-back">${t[1]}</div>
+    </div></div>
+    <div class="flash-controls">
+      <button class="ghost" id="fcPrev">&larr; Prev</button>
+      <span class="counter" style="margin:0 6px">${fcIdx+1} / ${KEY_TERMS.length}</span>
+      <button class="ghost" id="fcKnow">${fcKnown.has(fcIdx) ? '✓ Known' : 'Mark known'}</button>
+      <button class="ghost" id="fcNext">Next &rarr;</button>
+    </div>`;
+  document.getElementById('flashCard').onclick = () => document.getElementById('flashCard').classList.toggle('flipped');
+  document.getElementById('fcPrev').onclick = () => { fcIdx = (fcIdx - 1 + KEY_TERMS.length) % KEY_TERMS.length; renderFlash(); };
+  document.getElementById('fcNext').onclick = () => { fcIdx = (fcIdx + 1) % KEY_TERMS.length; renderFlash(); };
+  document.getElementById('fcKnow').onclick = () => {
+    if(fcKnown.has(fcIdx)) fcKnown.delete(fcIdx); else fcKnown.add(fcIdx);
+    saveState(); renderFlash();
+  };
+}
+
+let matchPairs = [], matchTermOrder = [], matchDefOrder = [], matchSel = null, matchMatched = new Set(), matchAttempts = 0;
+let matchBestAttempts = SAVED && Number.isFinite(SAVED.matchBestAttempts) ? SAVED.matchBestAttempts : null;
+function newMatchRound(){
+  const n = Math.min(8, KEY_TERMS.length);
+  const idxs = shuffled([...Array(KEY_TERMS.length).keys()]).slice(0, n);
+  matchPairs = idxs.map(i => ({ key:i, term:KEY_TERMS[i][0], def:KEY_TERMS[i][1] }));
+  matchTermOrder = shuffled(matchPairs);
+  matchDefOrder = shuffled(matchPairs);
+  matchSel = null; matchMatched = new Set(); matchAttempts = 0;
+}
+function matchBtn(p, side){
+  const isMatched = matchMatched.has(p.key);
+  const isSel = matchSel && matchSel.key === p.key && matchSel.side === side;
+  const label = side === 'term' ? p.term : p.def;
+  return `<button class="match-btn ${isMatched?'matched':''} ${isSel?'sel':''}" data-key="${p.key}" data-side="${side}" ${isMatched?'disabled':''}>${label}</button>`;
+}
+function matchStatusText(){
+  if(matchMatched.size === matchPairs.length) return `Solved in ${matchAttempts} attempts!`;
+  return `Match each term to its definition. Attempts: ${matchAttempts}`;
+}
+function renderMatch(){
+  if(!matchPairs.length) newMatchRound();
+  document.getElementById('toolWrap').innerHTML = `
+    <h3 style="color:var(--accent);margin-top:0">Match</h3>
+    <p style="color:var(--muted);font-size:13px" id="matchStatus">${matchStatusText()}</p>
+    <div class="match-grid">
+      <div class="match-col">${matchTermOrder.map(p => matchBtn(p,'term')).join('')}</div>
+      <div class="match-col">${matchDefOrder.map(p => matchBtn(p,'def')).join('')}</div>
+    </div>
+    <button class="ghost" id="matchNew" style="margin-top:14px">New round</button>`;
+  document.querySelectorAll('.match-btn').forEach(b => b.addEventListener('click', onMatchClick));
+  document.getElementById('matchNew').onclick = () => { newMatchRound(); renderMatch(); };
+}
+function onMatchClick(e){
+  const b = e.currentTarget;
+  const key = +b.dataset.key, side = b.dataset.side;
+  if(matchMatched.has(key)) return;
+  if(!matchSel || matchSel.side === side){ matchSel = { key, side }; renderMatch(); return; }
+  matchAttempts++;
+  if(matchSel.key === key){
+    matchMatched.add(key);
+    matchSel = null;
+    if(matchMatched.size === matchPairs.length){
+      if(matchBestAttempts === null || matchAttempts < matchBestAttempts) matchBestAttempts = matchAttempts;
+      saveState();
+    }
+    renderMatch();
+  } else {
+    b.classList.add('wrong');
+    const status = document.getElementById('matchStatus');
+    if(status) status.textContent = `Not quite. Attempts: ${matchAttempts}`;
+    setTimeout(() => { matchSel = null; renderMatch(); }, 500);
+  }
+}
+
+function popPool(){
+  const fromLessons = LESSONS.filter(l => l.quick).map(l => ({ q:l.quick.q, opts:l.quick.choices, correct:l.quick.a, ex:l.quick.ex }));
+  const fromQuiz = QUIZ.map(q => ({ q:q.q, opts:q.o, correct:q.c, ex:q.ex }));
+  return [...fromLessons, ...fromQuiz];
+}
+let popSet = [], popIdx = 0, popScore = 0, popDone = false;
+let popLastScore = SAVED && Number.isFinite(SAVED.popLastScore) ? SAVED.popLastScore : null;
+let popLastTotal = SAVED && Number.isFinite(SAVED.popLastTotal) ? SAVED.popLastTotal : null;
+let popAttemptsCount = SAVED && Number.isFinite(SAVED.popAttemptsCount) ? SAVED.popAttemptsCount : 0;
+function newPop(){
+  const pool = shuffled(popPool());
+  popSet = pool.slice(0, Math.min(5, pool.length));
+  popIdx = 0; popScore = 0; popDone = false;
+}
+function renderPop(){
+  if(!popSet.length) newPop();
+  if(popDone){
+    document.getElementById('toolWrap').innerHTML = `
+      <h3 style="color:var(--accent);margin-top:0">Pop Quiz</h3>
+      <p>Score: <b>${popScore} / ${popSet.length}</b></p>
+      <button class="ghost" id="popAgain">Try another 5</button>`;
+    document.getElementById('popAgain').onclick = () => { newPop(); renderPop(); };
+    return;
+  }
+  const it = popSet[popIdx];
+  document.getElementById('toolWrap').innerHTML = `
+    <h3 style="color:var(--accent);margin-top:0">Pop Quiz</h3>
+    <p style="color:var(--muted);font-size:13px">Question ${popIdx+1} of ${popSet.length} &middot; Score so far: ${popScore}</p>
+    <div class="qc"><p style="font-weight:600;font-size:14px;margin:0 0 6px">${it.q}</p>
+      <div id="popOpts">${it.opts.map((o,oi)=>`<button class="opt" data-oi="${oi}">${o}</button>`).join('')}</div>
+      <div class="explain" id="popEx"></div></div>
+    <button class="ghost" id="popNext" style="margin-top:12px;display:none">Next &rarr;</button>`;
+  document.getElementById('popOpts').addEventListener('click', e => {
+    const b = e.target.closest('.opt'); if(!b || b.disabled) return;
+    const oi = +b.dataset.oi;
+    [...document.getElementById('popOpts').children].forEach((el,i) => {
+      el.disabled = true;
+      if(i===it.correct) el.classList.add('correct'); else if(i===oi) el.classList.add('wrong');
+    });
+    if(oi === it.correct) popScore++;
+    const ex = document.getElementById('popEx'); ex.textContent = it.ex; ex.style.display = 'block';
+    document.getElementById('popNext').style.display = 'inline-block';
+  });
+  document.getElementById('popNext').onclick = () => {
+    popIdx++;
+    if(popIdx >= popSet.length){
+      popDone = true;
+      popLastScore = popScore; popLastTotal = popSet.length; popAttemptsCount++;
+      saveState();
+    }
+    renderPop();
+  };
+}
+
+const CHEATSHEET = `
+  <h3 style="color:var(--accent);margin-top:0">Cheat Sheet</h3>
+  <table class="cheat">
+    <tr><th>Concept</th><th>Rule</th></tr>
+    <tr><td>Socket match</td><td>Must match motherboard exactly — check firmware support for newer CPUs too</td></tr>
+    <tr><td>RAM generation</td><td>DDR4/DDR5 set by the motherboard, not the CPU — physically different notches</td></tr>
+    <tr><td>QVL</td><td>The motherboard's own tested-compatible RAM list — check before buying</td></tr>
+    <tr><td>PSU sizing</td><td>Headroom above minimum, for transient spikes — not just the label wattage</td></tr>
+    <tr><td>Most forgotten cable</td><td>CPU power (EPS, 4/8-pin) — separate from the 24-pin</td></tr>
+    <tr><td>Test-boot order</td><td>Outside the case first — isolates component vs. assembly problems</td></tr>
+    <tr><td>XMP</td><td>Not on by default — enable in UEFI to hit RAM's actual rated speed</td></tr>
+    <tr><td>Thermal paste</td><td>Pea-sized amount — more is not better</td></tr>
+    <tr><td>No-POST order</td><td>Power → RAM reseat → CPU power cable → standoffs → debug LEDs</td></tr>
+    <tr><td>PSU quality</td><td>Protection circuitry (OCP/OVP/SCP) matters more than wattage alone</td></tr>
+    <tr><td>Thermal throttling</td><td>Automatic downclocking under heat — presents as slow, not broken</td></tr>
+  </table>
+  <p style="color:var(--muted);font-size:12px;margin-top:10px">Full lesson content covers the reasoning
+     behind each row — this page is for last-minute recall, not first-time learning.</p>`;
+function renderCheat(){ document.getElementById('toolWrap').innerHTML = CHEATSHEET; }
+
+/* POST Troubleshooting Simulator — the "Simulation" tab. Three real-world
+   no-POST scenarios, each with one root-cause check and several red-herring
+   checks that rule things out. Continues the systematic-diagnosis theme
+   already established across Chain-K (Electronics-Circuits-Bench's
+   power->ground->orientation->joints order, Raspberry-Pi-Tinkering's
+   recovery order). */
+const POST_SCENARIOS = [
+  {
+    name: "Scenario 1 — Fans spin, no display, no beep",
+    checks: [
+      { label:"Check RAM is fully seated", root:false, outcome:"Reseated RAM. No change — still no display." },
+      { label:"Check the CPU power connector (EPS) is plugged in", root:true, outcome:"Found it — the CPU power connector was unplugged. After connecting it, the system POSTs and displays normally." },
+      { label:"Check the monitor cable is in the right port", root:false, outcome:"Cable already in the correct GPU port. No change." },
+      { label:"Check the GPU is fully seated", root:false, outcome:"GPU reseated. No change." },
+      { label:"Check case standoffs for shorts", root:false, outcome:"No shorted standoffs found. No change." }
+    ]
+  },
+  {
+    name: "Scenario 2 — Powers on, shuts off within a second",
+    checks: [
+      { label:"Check the PSU's power switch on the back", root:false, outcome:"PSU switch was already on. No change." },
+      { label:"Check the front-panel power switch wiring", root:true, outcome:"Found it — the front panel power switch connector was on the wrong pins, triggering an immediate shutdown signal. Reseated correctly; the system now stays on." },
+      { label:"Check RAM seating", root:false, outcome:"Reseated RAM. No change — still shuts off immediately." },
+      { label:"Check CPU cooler mount pressure", root:false, outcome:"Cooler mount checked, properly seated. No change." },
+      { label:"Check for a short under the board (extra standoff)", root:false, outcome:"No short found under the board. No change." }
+    ]
+  },
+  {
+    name: "Scenario 3 — Boots, one beep, but no display at all",
+    checks: [
+      { label:"Check the monitor cable is plugged into the GPU, not the motherboard", root:true, outcome:"Found it — the monitor cable was plugged into the motherboard's onboard video output instead of the discrete GPU. Moved it to the GPU port; display now works." },
+      { label:"Check RAM seating", root:false, outcome:"Reseated RAM. No change." },
+      { label:"Check the GPU's power connector(s)", root:false, outcome:"GPU power cables already properly connected. No change." },
+      { label:"Check boot order in UEFI", root:false, outcome:"Can't check yet — no display means no way to see UEFI. (This check needs video output first.)" },
+      { label:"Check PSU wattage is sufficient for the build", root:false, outcome:"PSU wattage confirmed sufficient. No change." }
+    ]
+  }
+];
+let postScenario = 0, postChecked = new Set(), postAttempts = 0, postSolved = false;
+let postBestChecks = (SAVED && SAVED.postBestChecks) ? SAVED.postBestChecks : {};
+function postReset(){ postChecked = new Set(); postAttempts = 0; postSolved = false; }
+function renderPostSim(){
+  const scenario = POST_SCENARIOS[postScenario];
+  document.getElementById('toolWrap').innerHTML = `
+    <h3 style="color:var(--accent);margin-top:0">POST Troubleshooting Simulator</h3>
+    <p style="color:var(--muted);font-size:13px">${scenario.name}. Click checks in whatever order seems
+       reasonable — find the actual cause in as few checks as possible.</p>
+    <div class="pills" style="padding:0;border:0;margin:10px 0">
+      ${POST_SCENARIOS.map((s,i)=>`<button class="pill ${i===postScenario?'active':''}" data-scn="${i}">Scenario ${i+1}</button>`).join('')}
+    </div>
+    ${scenario.checks.map((c,i)=>{
+      const isChecked = postChecked.has(i);
+      const cls = isChecked ? (c.root ? 'root' : 'ruled-out') : '';
+      return `<button class="post-check ${cls}" data-check="${i}" ${isChecked?'disabled':''}>${c.label}</button>
+        ${isChecked ? `<div class="post-outcome ${c.root?'root':''}">${c.outcome}</div>` : ''}`;
+    }).join('')}
+    ${postSolved ? `<div class="post-solved">✓ Fixed in ${postAttempts} check${postAttempts===1?'':'s'}! ${postBestChecks[postScenario] ? `Best so far: ${postBestChecks[postScenario]}.` : ''}</div>` : ''}
+    <button class="ghost" id="postNewRound" style="margin-top:14px">Reset this scenario</button>`;
+  document.querySelectorAll('[data-scn]').forEach(b => b.onclick = () => { postScenario = +b.dataset.scn; postReset(); renderPostSim(); });
+  document.querySelectorAll('[data-check]').forEach(b => b.onclick = () => {
+    const i = +b.dataset.check;
+    if(postChecked.has(i) || postSolved) return;
+    postChecked.add(i);
+    postAttempts++;
+    if(scenario.checks[i].root){
+      postSolved = true;
+      if(!postBestChecks[postScenario] || postAttempts < postBestChecks[postScenario]){
+        postBestChecks[postScenario] = postAttempts;
+      }
+      saveState();
+    }
+    renderPostSim();
+  });
+  document.getElementById('postNewRound').onclick = () => { postReset(); renderPostSim(); };
+}
+
+function letterGrade(pct){
+  if(pct === null) return { text:'—', cls:'grade-dash' };
+  if(pct >= 90) return { text:'A', cls:'grade-A' };
+  if(pct >= 80) return { text:'B', cls:'grade-B' };
+  if(pct >= 70) return { text:'C', cls:'grade-C' };
+  if(pct >= 60) return { text:'D', cls:'grade-D' };
+  return { text:'F', cls:'grade-F' };
+}
+function renderReportCard(){
+  const lessonsDone = answered.filter(Boolean).length;
+  const quizPct = QUIZ.length ? Math.round((score / QUIZ.length) * 100) : null;
+  const quizAttempted = done.size > 0;
+  const grade = letterGrade(quizAttempted ? quizPct : null);
+  const overallItems = lessonsDone + (quizAttempted ? 1 : 0);
+  const overallTotal = LESSONS.length + 1;
+  const overallPct = Math.round((overallItems / overallTotal) * 100);
+  const now = new Date();
+  const postSummary = POST_SCENARIOS.map((s,i) => postBestChecks[i] ? `Scenario ${i+1}: ${postBestChecks[i]}` : `Scenario ${i+1}: not solved`).join(' · ');
+  document.getElementById('toolWrap').innerHTML = `
+    <div class="report-card">
+      <h3 style="color:var(--accent);margin-top:0">Report Card</h3>
+      <p style="color:var(--muted);font-size:12px;margin-top:-6px">Build A PC &middot; generated ${now.toLocaleDateString()} ${now.toLocaleTimeString()}</p>
+      <div class="report-overall">
+        <span class="big ${grade.cls}">${grade.text}</span>
+        <span style="color:var(--muted);font-size:13px">Final quiz grade${quizAttempted ? '' : ' (not yet taken)'}</span>
+      </div>
+      <h4>Lessons</h4>
+      <div class="report-row"><span>Quick checks completed</span><span class="grade">${lessonsDone} / ${LESSONS.length}</span></div>
+      <h4>Final Quiz</h4>
+      <div class="report-row"><span>Score</span><span class="grade">${quizAttempted ? `${score} / ${QUIZ.length} (${quizPct}%)` : 'Not attempted'}</span></div>
+      <h4>Pop Quiz</h4>
+      <div class="report-row"><span>Most recent 5-question run</span><span class="grade">${popLastScore !== null ? `${popLastScore} / ${popLastTotal}` : 'Not attempted'}</span></div>
+      <div class="report-row"><span>Runs completed</span><span class="grade">${popAttemptsCount}</span></div>
+      <h4>Flashcards</h4>
+      <div class="report-row"><span>Terms marked known</span><span class="grade">${fcKnown.size} / ${KEY_TERMS.length}</span></div>
+      <h4>Match Game</h4>
+      <div class="report-row"><span>Best round (fewest attempts)</span><span class="grade">${matchBestAttempts !== null ? matchBestAttempts : 'Not completed'}</span></div>
+      <h4>POST Troubleshooting Simulator</h4>
+      <div class="report-row"><span>Best checks per scenario</span><span class="grade" style="font-size:11px">${postSummary}</span></div>
+      <h4>Overall</h4>
+      <div class="report-row"><span>Lessons + quiz completed</span><span class="grade">${overallItems} / ${overallTotal} (${overallPct}%)</span></div>
+      <button class="ghost" id="printBtn">🖨️ Print / Save as PDF</button>
+      <p style="color:var(--muted);font-size:11px;margin-top:8px">In the print dialog, choose <b>Save as PDF</b> and
+         save it into this project's <code>docs/</code> folder to keep a dated record.</p>
+    </div>`;
+  document.getElementById('printBtn').onclick = () => window.print();
+}
+
+document.getElementById('pills').addEventListener('click', e => {
+  const p = e.target.closest('.pill'); if(!p) return; idx = +p.dataset.i; render();
+});
+document.getElementById('prev').onclick = () => { if(idx>0){ idx--; render(); } };
+document.getElementById('next').onclick = () => { if(idx<LESSONS.length){ idx++; render(); } };
+render();
+</script>
+</body></html>

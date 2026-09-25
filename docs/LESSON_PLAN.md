@@ -28,6 +28,7 @@ By the end I can:
 1. Choose parts and verify every compatibility constraint.
 2. Test-boot outside the case before final assembly.
 3. Assemble and route cables.
+   - 🎥 [How to build a PC, the last guide you'll ever need! (Linus Tech Tips)](https://www.youtube.com/watch?v=BL4DCEp7blY) — watch the physical seating/cabling steps before doing them on real hardware.
 4. Enter UEFI; set boot order and enable XMP.
 5. Install the OS and drivers.
 6. Stress-test and monitor temperatures.
